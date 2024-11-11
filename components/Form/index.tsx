@@ -1,4 +1,4 @@
-import { Text, TextInput, View, TouchableOpacity } from "react-native";
+import { Text, TextInput, View, TouchableOpacity, Vibration } from "react-native";
 import ResultImc from "./ResultImc";
 import { useState } from "react";
 import styles from "./style";
@@ -9,6 +9,7 @@ export default function Form() {
     const [messageImc, setMessageImc] = useState("Preencha o peso e altura")
     const [imc, setImc] = useState<string | null>(null);
     const [textButton, setTextButton] = useState("Calcular")
+    const [errorMessage, setErrorMessage] = useState("")
 
     function imcCalculator() {
         const heightNum = parseFloat(height);
@@ -19,6 +20,12 @@ export default function Form() {
             setImc(calculatedImc);
         }
     }
+    function verificationImc(){
+        if(imc == null){
+            Vibration.vibrate()
+            setErrorMessage("Campo obrigatório*");
+        }
+    }
     function validationImc() {
         if (weight && height) {
             imcCalculator();
@@ -26,9 +33,11 @@ export default function Form() {
             setHeight("");
             setMessageImc("Seu IMC é igual:");
             setTextButton("Calcular Novamente");
+            setErrorMessage("");
         } else {
             setImc(null);
             setTextButton("Calcular");
+            verificationImc()
             setMessageImc("Preencha o peso e a altura");
         }
     }
@@ -36,6 +45,7 @@ export default function Form() {
         <View style={styles.formContext}>
             <View style={styles.form}>
                 <Text style={styles.formLabel}>Altura</Text>
+                <Text style={styles.erroMessage}>{errorMessage}</Text>
                 <TextInput
                     style={styles.input}
                     onChangeText={setHeight}
@@ -44,6 +54,8 @@ export default function Form() {
                     keyboardType="numeric" />
 
                 <Text style={styles.formLabel}>Peso</Text>
+                <Text style={styles.erroMessage}>{errorMessage}</Text>
+
                 <TextInput
                     style={styles.input}
                     value={weight}
